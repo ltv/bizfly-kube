@@ -1,105 +1,57 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# Bizfly Kubernetes GitHub Action
 
-# Create a JavaScript Action using TypeScript
+Fetches the config for your Bizfly Kubernetes Cluster, then installs and configures `kubectl`, exposing it to path for future use!
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+[![GitHub Release](https://img.shields.io/github/v/release/ltv/bizfly-kube)](https://github.com/ltv/bizfly-kube/releases/latest)
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
+For help updating, view the [change logs](https://github.com/ltv/bizfly-kube/releases).
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+## Runs on
 
-## Create an action from this template
+| Type                | Systems                                                                                       | Note                                                                                       |
+| :------------------ | :-------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------- |
+| GitHub Runners      | `ubuntu-16.04`, `ubuntu-18.04`, `ubuntu-20.04`, `macos-10.15`, `windows-2016`, `windows-2019` | _All available GitHub hosted runners._                                                     |
+| Self-Hosted Runners | `linux-amd64`, `linux-arm64`, `linux-s390x`, `macOS-x64`, `windows-x64`                       | _Not tested, but in theory should work as long as `kubectl` is available for your system._ |
 
-Click the `Use this Template` and provide the new repo details for your action
+## Inputs
 
-## Code in Main
+| Name               | Requirement    | Description                                                                                                                                                          |
+| :----------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `credentialId`     | **Required**   | A Bizfly Application credential id, create [here](https://manage.bizflycloud.vn/account/security).                                                                   |
+| `credentialSecret` | **Required**   | A Bizfly Application credential secret, create [here](https://manage.bizflycloud.vn/account/security).                                                               |
+| `clusterName`      | **Required**   | The name of the cluster you are trying to operate on. This was chosen during the _"Choose a name"_ step when originally creating the cluster.                        |
+| `version`          | **_Optional_** | The kubectl version to use. Remember to omit "v" prefix, for example: `1.21.3`. Defaults to `1.21.3`. _See [example](#specifying-a-specific-kubectl-version) below_. |
+| `namespace`        | **_Optional_** | The Kubernetes namespace to operate under. Defaults to `default`.                                                                                                    |
 
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
+## Example usage
 
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
+### Simple, minimal usage
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+- name: Set up kubectl
+  uses: ltv/bizfly-kube@v1
+  with:
+    credentialId: ${{ secrets.BIZFLY_CREDENTIAL_ID }}
+    credentialSecret: ${{ secrets.BIZFLY_CREDENTIAL_SECRET }}
+    clusterName: my-fabulous-cluster
+
+- name: Get nodes
+  run: kubectl get nodes
 ```
 
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
+This will setup `kubectl` configured with your Bizfly Kubernetes cluster. After that you're free to use `kubectl` as you wish!
 
-## Usage:
+### Specifying a specific kubectl version
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+```yaml
+- name: Set up kubectl
+  uses: ltv/bizfly-kube@v1
+  with:
+    credentialId: ${{ secrets.BIZFLY_CREDENTIAL_ID }}
+    credentialSecret: ${{ secrets.BIZFLY_CREDENTIAL_SECRET }}
+    clusterName: my-fabulous-cluster
+    version: '1.17.4'
+
+- name: Get nodes
+  run: kubectl get nodes
+```

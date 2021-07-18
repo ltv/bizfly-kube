@@ -1,11 +1,24 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Bizfly Kubernetes'
+description: 'Use Bizfly Kubernetes in GitHub Actions'
+author: 'LTV - Luc<luc@ltv.vn>'
 inputs:
-  milliseconds: # change this
+  credentialId:
+    description: 'Bizfly credential id'
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  credentialSecret:
+    description: 'Bizfly credential secret'
+    required: true
+  clusterName:
+    description: 'The name of the Bizfly Kubernetes cluster that you plan to work with.'
+    required: true
+  namespace:
+    description: 'The Kubernetes namespace to operate under.'
+    required: false
+    default: 'default'
+  version:
+    description: 'The kubectl version to use.'
+    required: false
+    default: '1.21.3'
 runs:
   using: 'node12'
   main: 'dist/index.js'
