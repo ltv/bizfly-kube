@@ -15,7 +15,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
       - name: Bump version
-        uses: ltv/standard-version@v1.8.0
+        uses: ltv/standard-version-action@v1.8.0
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
